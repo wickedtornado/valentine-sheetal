@@ -71,9 +71,12 @@
 <div id="terminal">
   <div id="boot"></div>
 <div id="pipeline" class="hidden">
-  <p>Running CI/CD Pipeline...</p>
-  <div id="progressBar" style="width:0%;height:10px;background:#00ff9f;"></div>
+  <p>> Running CI/CD Pipeline...</p>
+  <div style="width:100%; background:#222; height:12px; border-radius:6px; margin-top:10px;">
+    <div id="progressBar" style="width:0%; height:12px; background:#00ff9f; border-radius:6px;"></div>
+  </div>
 </div>
+
 
   <div id="commandSection" class="hidden">
     <p>> Enter deployment command to continue:</p>
@@ -94,10 +97,7 @@
     <p>Auto-renew: Enabled Forever ♾️</p>
   </div>
 </div>
-  <div id="pipeline" class="hidden">
-  <p>Running CI/CD Pipeline...</p>
-  <div id="progressBar" style="width:0%;height:10px;background:#00ff9f;"></div>
-</div>
+
 
 <script>
 
