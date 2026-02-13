@@ -107,6 +107,67 @@ input {
   border-radius: 15px;
   margin-top: 20px;
 }
+  .overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.4s ease;
+}
+
+#noImage {
+  max-width: 70%;
+  max-height: 70%;
+  border-radius: 20px;
+  box-shadow: 0 0 40px rgba(255,255,255,0.3);
+  transform: scale(0.9);
+  animation: popIn 0.4s ease forwards;
+}
+
+@keyframes popIn {
+  to { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+  #emailModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.emailCard {
+  background: white;
+  color: black;
+  width: 400px;
+  padding: 25px;
+  border-radius: 15px;
+  animation: slideUp 0.5s ease;
+  font-family: Arial, sans-serif;
+  text-align: left;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+
 </style>
 </head>
 <body>
@@ -114,11 +175,11 @@ input {
 <div id="terminal" class="visible">
 
   <!-- AUTH -->
-  <div id="auth">
-    <p>Authentication Required</p>
-    <p><i>Hint: What do I call you?</i></p>
-    <input type="text" id="authInput" autofocus />
-  </div>
+ <div id="auth">
+  <p>Authentication Required</p>
+  <input type="text" id="authInput" autofocus />
+  <p id="authError" style="color:#ff7b9c; margin-top:10px;"></p>
+</div>
 
   <!-- CI/CD -->
   <div id="ci" class="hidden">
@@ -144,10 +205,27 @@ input {
     <button class="no" onclick="reject()">No</button>
   </div>
 
-  <!-- NO IMAGE SCREEN -->
-  <div id="noScreen" class="hidden">
-    <img id="noImage" src="Side_Eyeing_Chloe.jpg">
+  <div id="emailModal" class="hidden">
+  <div class="emailCard">
+    <h3>📩 New Message</h3>
+    <p><strong>To:</strong> My Favorite Person</p>
+    <p><strong>Subject:</strong> Valentine Confirmation</p>
+    <hr>
+    <p>
+      Your response has been successfully received.<br><br>
+      Status: Accepted ❤️<br><br>
+      I can't wait to spend this Valentine’s Day with you.
+    </p>
   </div>
+</div>
+
+
+  <!-- NO IMAGE SCREEN -->
+ <div id="noScreen" class="hidden">
+  <div class="overlay">
+    <img id="noImage" src="image.jpg">
+  </div>
+</div>
 
 </div>
 
@@ -165,16 +243,19 @@ const commandInput = document.getElementById("commandInput");
 const proposalDiv = document.getElementById("proposal");
 const noScreen = document.getElementById("noScreen");
 
+const authError = document.getElementById("authError");
+
 authInput.addEventListener("keypress", function(e) {
   if (e.key === "Enter") {
     if (authInput.value.toLowerCase() === correctKey.toLowerCase()) {
       authDiv.classList.add("hidden");
       startCI();
     } else {
-      alert("401 Unauthorized — Wrong nickname 😌");
+      authError.innerText = "Incorrect. Hint: What do I call you? ❤️";
     }
   }
 });
+
 
 function startCI() {
   ciDiv.classList.remove("hidden");
@@ -222,8 +303,11 @@ commandInput.addEventListener("keypress", function(e) {
   }
 });
 
+const emailModal = document.getElementById("emailModal");
+
 function approve() {
-  alert("You just made my heart deploy successfully ❤️\n\nHappy Valentine's Day 🥰");
+  proposalDiv.classList.add("hidden");
+  emailModal.classList.remove("hidden");
 }
 
 function reject() {
