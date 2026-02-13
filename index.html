@@ -1,228 +1,281 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Love Deployment</title>
-  <meta charset="UTF-8" />
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <style>
-    body {
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Production Deployment</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
   margin: 0;
-  background: radial-gradient(circle at center, #0f0f0f 0%, #000 100%);
-  color: #00ff9f;
-  font-family: "Courier New", monospace;
-  height: 100vh;
+  font-family: 'Fira Code', monospace;
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100vh;
+  color: #f5f5f5;
   overflow: hidden;
-  text-shadow: 0 0 5px #00ff9f;
 }
 
-   #terminal {
-  background: rgba(0,0,0,0.8);
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 0 30px #00ff9f33;
+#terminal {
+  width: 650px;
+  padding: 30px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  transition: all 0.6s ease;
+  position: relative;
 }
 
-    .hidden {
-      display: none;
-    }
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+}
 
-    input {
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid #00ff9f;
-      color: #00ff9f;
-      font-family: inherit;
-      font-size: 16px;
-      width: 100%;
-      outline: none;
-    }
+.visible {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
 
-    button {
-      padding: 10px 20px;
-      margin: 10px;
-      font-family: inherit;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-    }
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  border-radius: 8px;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
 
-    #yesBtn {
-      background: #00ff9f;
-      color: black;
-    }
+.approve {
+  background: #00ff9f;
+  color: #000;
+}
 
-    #noBtn {
-      background: #ff4d6d;
-      color: white;
-      position: absolute;
-    }
+.request {
+  background: transparent;
+  border: 1px solid #ccc;
+  color: #fff;
+}
 
-    #proposal {
-      text-align: center;
-    }
-  </style>
+button:hover {
+  transform: scale(1.05);
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #aaa;
+  color: white;
+  font-family: inherit;
+  margin-top: 10px;
+}
+
+#logs {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.progress-container {
+  width: 100%;
+  background: #222;
+  height: 12px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+#progressBar {
+  width: 0%;
+  height: 12px;
+  background: #00ff9f;
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.fade-out {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+#finalScreen {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  padding: 30px;
+  transition: all 0.8s ease;
+}
+
+.glow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #ffffff;
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: float 6s infinite ease-in-out;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); opacity: 0.4; }
+  50% { transform: translateY(-20px); opacity: 1; }
+  100% { transform: translateY(0px); opacity: 0.4; }
+}
+
+</style>
 </head>
-
 <body>
 
-<div id="terminal">
-  <div id="boot"></div>
-<div id="pipeline" class="hidden">
-  <p>> Running CI/CD Pipeline...</p>
-  <div style="width:100%; background:#222; height:12px; border-radius:6px; margin-top:10px;">
-    <div id="progressBar" style="width:0%; height:12px; background:#00ff9f; border-radius:6px;"></div>
+<div id="terminal" class="visible">
+
+  <div id="auth">
+    <p>Authentication Required</p>
+    <p>Enter access key:</p>
+    <input type="text" id="authInput" autofocus />
   </div>
-</div>
 
+  <div id="ci" class="hidden">
+    <div id="logs"></div>
+    <div class="progress-container">
+      <div id="progressBar"></div>
+    </div>
+  </div>
 
-  <div id="commandSection" class="hidden">
-    <p>> Enter deployment command to continue:</p>
-    <input type="text" id="commandInput" placeholder="Type command and press Enter" />
-    <div id="errorMsg"></div>
+  <div id="command" class="hidden">
+    <p>System Ready.</p>
+    <p>Enter deployment command:</p>
+    <input type="text" id="commandInput" />
   </div>
 
   <div id="proposal" class="hidden">
-    <h2>System Prompt:</h2>
-    <p>Would you like to be my Valentine? 💖</p>
-    <button id="yesBtn" onclick="acceptLove()">ACCEPT_REQUEST</button>
-    <button id="noBtn" onmouseover="blockNo()">ROLLBACK</button>
+    <p>
+      After resolving all dependencies,<br>
+      running every test case,<br><br>
+      I have only one request:
+    </p>
+    <p><strong>Will you merge your life with mine this Valentine's Day?</strong></p>
+    <button class="approve" onclick="approve()">Approve Merge</button>
+    <button class="request" onclick="reject()">Request Changes</button>
+    <p id="mergeMessage"></p>
   </div>
 
-  <div id="finalMessage" class="hidden">
-    <h1>❤️ Deployment Successful ❤️</h1>
-    <p>Relationship status: Running in Production</p>
-    <p>Auto-renew: Enabled Forever ♾️</p>
+  <div id="finalScreen" class="hidden">
+    <h2>Merge Successful ❤️</h2>
+    <p>
+      You are my favorite notification.<br>
+      My safest production environment.<br>
+      My most stable release.<br><br>
+      And I never want to rollback.
+    </p>
+    <p>Happy Valentine's Day ❤️</p>
   </div>
+
 </div>
 
-
 <script>
+const correctKey = "forever";
+const correctCommand = "deploy forever";
 
-const bootMessages = [
-  "Initializing Love Service...",
-  "Loading shared memories...",
-  "Compiling inside jokes...",
-  "Establishing secure emotional connection...",
-  "Scaling affection pods...",
-  "System ready."
-];
+const authInput = document.getElementById("authInput");
+const authDiv = document.getElementById("auth");
+const ciDiv = document.getElementById("ci");
+const logs = document.getElementById("logs");
+const progressBar = document.getElementById("progressBar");
+const commandDiv = document.getElementById("command");
+const commandInput = document.getElementById("commandInput");
+const proposalDiv = document.getElementById("proposal");
+const mergeMessage = document.getElementById("mergeMessage");
+const finalScreen = document.getElementById("finalScreen");
 
-let i = 0;
-const bootDiv = document.getElementById("boot");
-
-function typeLine(text, callback) {
-  let index = 0;
-  const line = document.createElement("div");
-  bootDiv.appendChild(line);
-
-  function typing() {
-    if (index < text.length) {
-      line.innerHTML += text.charAt(index);
-      index++;
-      setTimeout(typing, 30);
-    } else {
-      line.innerHTML += "<br>";
-      if (callback) callback();
-    }
-  }
-
-  typing();
-}
-
-function startBootSequence(index = 0) {
-  if (index < bootMessages.length) {
-    typeLine("> " + bootMessages[index], () => {
-      setTimeout(() => startBootSequence(index + 1), 400);
-    });
-  } else {
-    runPipeline(() => {
-      document.getElementById("pipeline").classList.add("hidden");
-      document.getElementById("commandSection").classList.remove("hidden");
-    });
-  }
-}
-
-startBootSequence();
-
-
-// Command logic
-document.getElementById("commandInput").addEventListener("keypress", function(e) {
+authInput.addEventListener("keypress", function(e) {
   if (e.key === "Enter") {
-    checkCommand();
+    if (authInput.value.toLowerCase() === correctKey) {
+      authDiv.classList.add("hidden");
+      startCI();
+    } else {
+      alert("401 Unauthorized — Access denied.");
+    }
   }
 });
 
-function checkCommand() {
-  const input = document.getElementById("commandInput").value.trim();
-  const errorDiv = document.getElementById("errorMsg");
+function startCI() {
+  ciDiv.classList.remove("hidden");
+  ciDiv.classList.add("visible");
 
-  if (input === "deploy forever") {
-    errorDiv.innerHTML = "> Deployment validated. Proceeding...<br>";
-    setTimeout(() => {
-      document.getElementById("commandSection").classList.add("hidden");
-      document.getElementById("proposal").classList.remove("hidden");
-    }, 1000);
-  } else {
-    errorDiv.innerHTML =
-  "> ERROR: SyntaxException: love not defined.<br>" +
-  "> StackTrace: at Heart.java:143<br>" +
-  "> Hint: Try deploying forever 😉<br><br>";
+  const logLines = [
+    "[INFO] Initializing system...",
+    "[INFO] GET /memories → 200 OK",
+    "[INFO] POST /feelings → 201 Created",
+    "[INFO] Resolving dependencies...",
+    "[INFO] Deploying forever-service..."
+  ];
 
-  }
+  let i = 0;
+  let progress = 0;
 
-  document.getElementById("commandInput").value = "";
-}
-
-// Block NO button
-function blockNo() {
-  const btn = document.getElementById("noBtn");
-  btn.style.top = Math.random() * window.innerHeight + "px";
-  btn.style.left = Math.random() * window.innerWidth + "px";
-}
-
-// Accept love
-function acceptLove() {
-
-  // Smooth background transition
-  document.body.style.transition = "all 1.5s ease";
-  document.body.style.background = "linear-gradient(135deg, #ff758c, #ff7eb3)";
-  document.body.style.color = "white";
-  document.body.style.textShadow = "none";
-
-  document.getElementById("proposal").classList.add("hidden");
-  document.getElementById("finalMessage").classList.remove("hidden");
-
-  confetti({
-    particleCount: 250,
-    spread: 150,
-    origin: { y: 0.6 }
-  });
-}
-
-  function runPipeline(callback) {
-  const pipeline = document.getElementById("pipeline");
-  const bar = document.getElementById("progressBar");
-
-  pipeline.classList.remove("hidden");
-
-  let width = 0;
-
-  const interval = setInterval(() => {
-    width += 5;
-    bar.style.width = width + "%";
-
-    if (width >= 100) {
-      clearInterval(interval);
-      setTimeout(callback, 600);
+  const logInterval = setInterval(() => {
+    if (i < logLines.length) {
+      logs.innerHTML += logLines[i] + "<br>";
+      i++;
     }
-  }, 80);
+  }, 800);
+
+  const progressInterval = setInterval(() => {
+    progress += 5;
+    progressBar.style.width = progress + "%";
+    if (progress >= 100) {
+      clearInterval(progressInterval);
+      clearInterval(logInterval);
+      setTimeout(() => {
+        ciDiv.classList.add("hidden");
+        commandDiv.classList.remove("hidden");
+        commandDiv.classList.add("visible");
+      }, 800);
+    }
+  }, 150);
 }
 
+commandInput.addEventListener("keypress", function(e) {
+  if (e.key === "Enter") {
+    if (commandInput.value.toLowerCase() === correctCommand) {
+      commandDiv.classList.add("hidden");
+      proposalDiv.classList.remove("hidden");
+      proposalDiv.classList.add("visible");
+    } else {
+      alert("Command not recognized. Hint: deploy forever");
+    }
+  }
+});
 
+function reject() {
+  mergeMessage.innerText = "Conflict detected. Auto-resolving in favor of love...";
+  setTimeout(approve, 2000);
+}
 
+function approve() {
+  proposalDiv.classList.add("hidden");
+  finalScreen.classList.remove("hidden");
+  finalScreen.classList.add("visible");
+  generateGlow();
+}
+
+function generateGlow() {
+  for (let i = 0; i < 20; i++) {
+    const glow = document.createElement("div");
+    glow.classList.add("glow");
+    glow.style.left = Math.random() * 100 + "%";
+    glow.style.top = Math.random() * 100 + "%";
+    glow.style.animationDelay = Math.random() * 5 + "s";
+    document.body.appendChild(glow);
+  }
+}
 </script>
 
 </body>
