@@ -6,22 +6,24 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     body {
-      margin: 0;
-      background: #0f0f0f;
-      color: #00ff9f;
-      font-family: "Courier New", monospace;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      text-align: left;
-    }
+  margin: 0;
+  background: radial-gradient(circle at center, #0f0f0f 0%, #000 100%);
+  color: #00ff9f;
+  font-family: "Courier New", monospace;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  text-shadow: 0 0 5px #00ff9f;
+}
 
-    #terminal {
-      width: 80%;
-      max-width: 800px;
-    }
+   #terminal {
+  background: rgba(0,0,0,0.8);
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 0 30px #00ff9f33;
+}
 
     .hidden {
       display: none;
@@ -88,6 +90,10 @@
     <p>Auto-renew: Enabled Forever ♾️</p>
   </div>
 </div>
+  <div id="pipeline" class="hidden">
+  <p>Running CI/CD Pipeline...</p>
+  <div id="progressBar" style="width:0%;height:10px;background:#00ff9f;"></div>
+</div>
 
 <script>
 
@@ -103,17 +109,37 @@ const bootMessages = [
 let i = 0;
 const bootDiv = document.getElementById("boot");
 
-function typeBoot() {
-  if (i < bootMessages.length) {
-    bootDiv.innerHTML += "> " + bootMessages[i] + "<br>";
-    i++;
-    setTimeout(typeBoot, 800);
+function typeLine(text, callback) {
+  let index = 0;
+  const line = document.createElement("div");
+  bootDiv.appendChild(line);
+
+  function typing() {
+    if (index < text.length) {
+      line.innerHTML += text.charAt(index);
+      index++;
+      setTimeout(typing, 30);
+    } else {
+      line.innerHTML += "<br>";
+      if (callback) callback();
+    }
+  }
+
+  typing();
+}
+
+function startBootSequence(index = 0) {
+  if (index < bootMessages.length) {
+    typeLine("> " + bootMessages[index], () => {
+      setTimeout(() => startBootSequence(index + 1), 400);
+    });
   } else {
     document.getElementById("commandSection").classList.remove("hidden");
   }
 }
 
-typeBoot();
+startBootSequence();
+
 
 // Command logic
 document.getElementById("commandInput").addEventListener("keypress", function(e) {
@@ -126,16 +152,18 @@ function checkCommand() {
   const input = document.getElementById("commandInput").value.trim();
   const errorDiv = document.getElementById("errorMsg");
 
-  if (input === "deploy forever.yaml") {
+  if (input === "deploy forever") {
     errorDiv.innerHTML = "> Deployment validated. Proceeding...<br>";
     setTimeout(() => {
       document.getElementById("commandSection").classList.add("hidden");
       document.getElementById("proposal").classList.remove("hidden");
     }, 1000);
   } else {
-    errorDiv.innerHTML = 
-      "> ERROR: Command not recognized.<br>" +
-      "> Hint: Maybe try deploying forever? 😉<br><br>";
+    errorDiv.innerHTML =
+  "> ERROR: SyntaxException: love not defined.<br>" +
+  "> StackTrace: at Heart.java:143<br>" +
+  "> Hint: Try deploying forever 😉<br><br>";
+
   }
 
   document.getElementById("commandInput").value = "";
@@ -159,6 +187,22 @@ function acceptLove() {
     origin: { y: 0.6 }
   });
 }
+
+  function runPipeline(callback) {
+  document.getElementById("pipeline").classList.remove("hidden");
+  let width = 0;
+  const bar = document.getElementById("progressBar");
+
+  const interval = setInterval(() => {
+    width += 5;
+    bar.style.width = width + "%";
+    if (width >= 100) {
+      clearInterval(interval);
+      setTimeout(callback, 500);
+    }
+  }, 100);
+}
+
 
 </script>
 
