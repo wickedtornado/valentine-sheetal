@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Love Deployment</title>
+  <meta charset="UTF-8" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background: #0f0f0f;
+      color: #00ff9f;
+      font-family: "Courier New", monospace;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      text-align: left;
+    }
+
+    #terminal {
+      width: 80%;
+      max-width: 800px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #00ff9f;
+      color: #00ff9f;
+      font-family: inherit;
+      font-size: 16px;
+      width: 100%;
+      outline: none;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    #yesBtn {
+      background: #00ff9f;
+      color: black;
+    }
+
+    #noBtn {
+      background: #ff4d6d;
+      color: white;
+      position: absolute;
+    }
+
+    #proposal {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="terminal">
+  <div id="boot"></div>
+
+  <div id="commandSection" class="hidden">
+    <p>> Enter deployment command to continue:</p>
+    <input type="text" id="commandInput" placeholder="Type command and press Enter" />
+    <div id="errorMsg"></div>
+  </div>
+
+  <div id="proposal" class="hidden">
+    <h2>System Prompt:</h2>
+    <p>Would you like to be my Valentine? 💖</p>
+    <button id="yesBtn" onclick="acceptLove()">ACCEPT_REQUEST</button>
+    <button id="noBtn" onmouseover="blockNo()">ROLLBACK</button>
+  </div>
+
+  <div id="finalMessage" class="hidden">
+    <h1>❤️ Deployment Successful ❤️</h1>
+    <p>Relationship status: Running in Production</p>
+    <p>Auto-renew: Enabled Forever ♾️</p>
+  </div>
+</div>
+
+<script>
+
+const bootMessages = [
+  "Initializing Love Service...",
+  "Loading shared memories...",
+  "Compiling inside jokes...",
+  "Establishing secure emotional connection...",
+  "Scaling affection pods...",
+  "System ready."
+];
+
+let i = 0;
+const bootDiv = document.getElementById("boot");
+
+function typeBoot() {
+  if (i < bootMessages.length) {
+    bootDiv.innerHTML += "> " + bootMessages[i] + "<br>";
+    i++;
+    setTimeout(typeBoot, 800);
+  } else {
+    document.getElementById("commandSection").classList.remove("hidden");
+  }
+}
+
+typeBoot();
+
+// Command logic
+document.getElementById("commandInput").addEventListener("keypress", function(e) {
+  if (e.key === "Enter") {
+    checkCommand();
+  }
+});
+
+function checkCommand() {
+  const input = document.getElementById("commandInput").value.trim();
+  const errorDiv = document.getElementById("errorMsg");
+
+  if (input === "deploy forever.yaml") {
+    errorDiv.innerHTML = "> Deployment validated. Proceeding...<br>";
+    setTimeout(() => {
+      document.getElementById("commandSection").classList.add("hidden");
+      document.getElementById("proposal").classList.remove("hidden");
+    }, 1000);
+  } else {
+    errorDiv.innerHTML = 
+      "> ERROR: Command not recognized.<br>" +
+      "> Hint: Maybe try deploying forever? 😉<br><br>";
+  }
+
+  document.getElementById("commandInput").value = "";
+}
+
+// Block NO button
+function blockNo() {
+  const btn = document.getElementById("noBtn");
+  btn.style.top = Math.random() * window.innerHeight + "px";
+  btn.style.left = Math.random() * window.innerWidth + "px";
+}
+
+// Accept love
+function acceptLove() {
+  document.getElementById("proposal").classList.add("hidden");
+  document.getElementById("finalMessage").classList.remove("hidden");
+
+  confetti({
+    particleCount: 200,
+    spread: 120,
+    origin: { y: 0.6 }
+  });
+}
+
+</script>
+
+</body>
+</html>
