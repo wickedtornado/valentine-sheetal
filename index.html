@@ -45,9 +45,6 @@ body {
   #emailModal {
   z-index: 999;
 }
-.overlay {
-  z-index: 998;
-}
 
 
 button {
@@ -112,19 +109,22 @@ input {
   .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.85);
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
-  backdrop-filter: blur(6px);
-  z-index: 998;
+  z-index: 9999;
 }
 
+
 #noImage {
-  width: 450px;
-  max-width: 90vw;
+  width: 500px;
+  max-width: 85vw;
   border-radius: 25px;
-  box-shadow: 0 0 60px rgba(255, 0, 120, 0.6);
+  box-shadow: 0 0 80px rgba(255, 0, 120, 0.8);
   animation: popIn 0.4s ease forwards;
 }
 
@@ -312,16 +312,16 @@ function approve() {
   }, 500);
 }
 
-
 function reject() {
-  proposalDiv.classList.add("hidden");
   noScreen.classList.remove("hidden");
 
   setTimeout(() => {
     noScreen.classList.add("hidden");
-    proposalDiv.classList.remove("hidden");
   }, 3000);
 }
+
+
+  
 </script>
 
 </body>
