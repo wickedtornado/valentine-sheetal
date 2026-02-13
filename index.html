@@ -33,10 +33,9 @@ body {
 }
 
 .hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(10px);
+  display: none !important;
 }
+
 
 .visible {
   opacity: 1;
@@ -102,11 +101,7 @@ input {
   transition: width 0.3s ease;
 }
 
-#noImage {
-  max-width: 100%;
-  border-radius: 15px;
-  margin-top: 20px;
-}
+
   .overlay {
   position: fixed;
   top: 0;
@@ -308,6 +303,7 @@ const emailModal = document.getElementById("emailModal");
 function approve() {
   proposalDiv.classList.add("hidden");
   emailModal.classList.remove("hidden");
+  document.getElementById("terminal").style.filter = "blur(3px)";
 }
 
 function reject() {
