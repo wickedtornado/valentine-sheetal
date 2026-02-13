@@ -29,6 +29,7 @@ body {
   box-shadow: 0 20px 50px rgba(0,0,0,0.4);
   transition: all 0.6s ease;
   position: relative;
+  text-align: center;
 }
 
 .hidden {
@@ -53,15 +54,14 @@ button {
   transition: all 0.3s ease;
 }
 
-.approve {
+.yes {
   background: #00ff9f;
   color: #000;
 }
 
-.request {
-  background: transparent;
-  border: 1px solid #ccc;
-  color: #fff;
+.no {
+  background: #ff4d6d;
+  color: white;
 }
 
 button:hover {
@@ -77,11 +77,13 @@ input {
   color: white;
   font-family: inherit;
   margin-top: 10px;
+  text-align: center;
 }
 
 #logs {
   font-size: 14px;
   line-height: 1.6;
+  text-align: left;
 }
 
 .progress-container {
@@ -100,47 +102,25 @@ input {
   transition: width 0.3s ease;
 }
 
-.fade-out {
-  opacity: 0;
-  transform: scale(0.95);
+#noImage {
+  max-width: 100%;
+  border-radius: 15px;
+  margin-top: 20px;
 }
-
-#finalScreen {
-  position: absolute;
-  text-align: center;
-  width: 100%;
-  padding: 30px;
-  transition: all 0.8s ease;
-}
-
-.glow {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: #ffffff;
-  border-radius: 50%;
-  opacity: 0.4;
-  animation: float 6s infinite ease-in-out;
-}
-
-@keyframes float {
-  0% { transform: translateY(0px); opacity: 0.4; }
-  50% { transform: translateY(-20px); opacity: 1; }
-  100% { transform: translateY(0px); opacity: 0.4; }
-}
-
 </style>
 </head>
 <body>
 
 <div id="terminal" class="visible">
 
+  <!-- AUTH -->
   <div id="auth">
     <p>Authentication Required</p>
-    <p>Enter access key:</p>
+    <p><i>Hint: What do I call you?</i></p>
     <input type="text" id="authInput" autofocus />
   </div>
 
+  <!-- CI/CD -->
   <div id="ci" class="hidden">
     <div id="logs"></div>
     <div class="progress-container">
@@ -148,39 +128,31 @@ input {
     </div>
   </div>
 
+  <!-- COMMAND -->
   <div id="command" class="hidden">
     <p>System Ready.</p>
     <p>Enter deployment command:</p>
     <input type="text" id="commandInput" />
   </div>
 
+  <!-- PROPOSAL -->
   <div id="proposal" class="hidden">
-    <p>
-      After resolving all dependencies,<br>
-      running every test case,<br><br>
-      I have only one request:
+    <p style="font-size: 20px;">
+      Will you be my Valentine? ❤️
     </p>
-    <p><strong>Will you merge your life with mine this Valentine's Day?</strong></p>
-    <button class="approve" onclick="approve()">Approve Merge</button>
-    <button class="request" onclick="reject()">Request Changes</button>
-    <p id="mergeMessage"></p>
+    <button class="yes" onclick="approve()">Yes</button>
+    <button class="no" onclick="reject()">No</button>
   </div>
 
-  <div id="finalScreen" class="hidden">
-    <h2>Merge Successful ❤️</h2>
-    <p>
-      You are my favorite notification.<br>
-      My safest production environment.<br>
-      My most stable release.<br><br>
-      And I never want to rollback.
-    </p>
-    <p>Happy Valentine's Day ❤️</p>
+  <!-- NO IMAGE SCREEN -->
+  <div id="noScreen" class="hidden">
+    <img id="noImage" src="Side_Eyeing_Chloe.jpg">
   </div>
 
 </div>
 
 <script>
-const correctKey = "forever";
+const correctKey = "gundu";
 const correctCommand = "deploy forever";
 
 const authInput = document.getElementById("authInput");
@@ -191,30 +163,28 @@ const progressBar = document.getElementById("progressBar");
 const commandDiv = document.getElementById("command");
 const commandInput = document.getElementById("commandInput");
 const proposalDiv = document.getElementById("proposal");
-const mergeMessage = document.getElementById("mergeMessage");
-const finalScreen = document.getElementById("finalScreen");
+const noScreen = document.getElementById("noScreen");
 
 authInput.addEventListener("keypress", function(e) {
   if (e.key === "Enter") {
-    if (authInput.value.toLowerCase() === correctKey) {
+    if (authInput.value.toLowerCase() === correctKey.toLowerCase()) {
       authDiv.classList.add("hidden");
       startCI();
     } else {
-      alert("401 Unauthorized — Access denied.");
+      alert("401 Unauthorized — Wrong nickname 😌");
     }
   }
 });
 
 function startCI() {
   ciDiv.classList.remove("hidden");
-  ciDiv.classList.add("visible");
 
   const logLines = [
     "[INFO] Initializing system...",
     "[INFO] GET /memories → 200 OK",
     "[INFO] POST /feelings → 201 Created",
-    "[INFO] Resolving dependencies...",
-    "[INFO] Deploying forever-service..."
+    "[INFO] Running valentine-service...",
+    "[INFO] Deployment in progress..."
   ];
 
   let i = 0;
@@ -236,7 +206,6 @@ function startCI() {
       setTimeout(() => {
         ciDiv.classList.add("hidden");
         commandDiv.classList.remove("hidden");
-        commandDiv.classList.add("visible");
       }, 800);
     }
   }, 150);
@@ -247,34 +216,24 @@ commandInput.addEventListener("keypress", function(e) {
     if (commandInput.value.toLowerCase() === correctCommand) {
       commandDiv.classList.add("hidden");
       proposalDiv.classList.remove("hidden");
-      proposalDiv.classList.add("visible");
     } else {
       alert("Command not recognized. Hint: deploy forever");
     }
   }
 });
 
-function reject() {
-  mergeMessage.innerText = "Conflict detected. Auto-resolving in favor of love...";
-  setTimeout(approve, 2000);
-}
-
 function approve() {
-  proposalDiv.classList.add("hidden");
-  finalScreen.classList.remove("hidden");
-  finalScreen.classList.add("visible");
-  generateGlow();
+  alert("You just made my heart deploy successfully ❤️\n\nHappy Valentine's Day 🥰");
 }
 
-function generateGlow() {
-  for (let i = 0; i < 20; i++) {
-    const glow = document.createElement("div");
-    glow.classList.add("glow");
-    glow.style.left = Math.random() * 100 + "%";
-    glow.style.top = Math.random() * 100 + "%";
-    glow.style.animationDelay = Math.random() * 5 + "s";
-    document.body.appendChild(glow);
-  }
+function reject() {
+  proposalDiv.classList.add("hidden");
+  noScreen.classList.remove("hidden");
+
+  setTimeout(() => {
+    noScreen.classList.add("hidden");
+    proposalDiv.classList.remove("hidden");
+  }, 3000);
 }
 </script>
 
